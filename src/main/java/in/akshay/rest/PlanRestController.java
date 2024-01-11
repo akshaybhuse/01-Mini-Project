@@ -14,14 +14,28 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.akshay.constants.AppConstants;
 import in.akshay.entity.Plan;
+import in.akshay.props.AppProperties;
 import in.akshay.service.PlanService;
 
 @RestController
 public class PlanRestController {
 
-	@Autowired
+	
 	private PlanService planService;
+	
+	
+	private Map<String, String> messages;
+	
+	
+
+	public PlanRestController(PlanService planService, AppProperties appProperties) {
+		super();
+		this.planService = planService;
+		this.messages = appProperties.getMessages();
+		System.out.println(messages);
+	}
 
 	@GetMapping("/plan-categories")
 	public ResponseEntity<Map<Integer, String>> getPlanCategories() {
@@ -31,13 +45,17 @@ public class PlanRestController {
 
 	@PostMapping("/save-plane")
 	public ResponseEntity<String> savePlan(@RequestBody Plan plan) {
+		
+		//Map<String, String> messages = appProperties.getMessagesMap();
 		boolean isPlanSaved = planService.savePlan(plan);
 
-		String responseMsg = "";
+		//String responseMsg = "";
+		String responseMsg = AppConstants.EMPTY_STR;
 		if (isPlanSaved)
-			responseMsg = "Plan Saved Successfully...";
+			responseMsg = messages.get(AppConstants.PLAN_SAVE_SUCC);
 		else
-			responseMsg = "Plan Not Saved.";
+			responseMsg = messages.get(AppConstants.PLAN_SAVE_FAIL);
+		
 		return new ResponseEntity<>(responseMsg, HttpStatus.OK);
 	}
 
@@ -58,11 +76,11 @@ public class PlanRestController {
 	public ResponseEntity<String> updatePlan(@RequestBody Plan plan) {
 		boolean isPlanUpdated = planService.updatePlan(plan);
 
-		String msg = "";
+		String msg = AppConstants.EMPTY_STR;
 		if (isPlanUpdated)
-			msg = "Plan updated Successfully...";
+			msg = messages.get(AppConstants.PLAN_UPDATE_SUCC);
 		else
-			msg = "Plan not updated.";
+			msg = messages.get(AppConstants.PLAN_UPDATE_FAIL);
 		return new ResponseEntity<>(msg, HttpStatus.OK);
 	}
 
@@ -70,12 +88,12 @@ public class PlanRestController {
 	public ResponseEntity<String> deletePlan(@PathVariable Integer planId) {
 		boolean isDeleted = planService.deletePlanById(planId);
 
-		String msg = " ";
+		String msg = AppConstants.EMPTY_STR;
 
 		if (isDeleted)
-			msg = "Plan deleted successfully...";
+			msg = messages.get(AppConstants.PLAN_DELETE_SUCC);
 		else
-			msg = "Plan not deleted.";
+			msg = messages.get(AppConstants.PLAN_DELETE_FAIL);
 
 		return new ResponseEntity<>(msg, HttpStatus.OK);
 	}
@@ -83,11 +101,11 @@ public class PlanRestController {
 	@PutMapping("/status-change/{planId}/{status}")
 	public ResponseEntity<String> changeStatus(@PathVariable Integer planId, @PathVariable String status) {
 		boolean isStatusChanged = planService.chnagePlanStatus(planId, status);
-		String msg = "";
+		String msg = AppConstants.EMPTY_STR;
 		if (isStatusChanged)
-			msg = "Status is changed...";
+			msg = messages.get(AppConstants.PLAN_STATUS_CHANGE_SUCC);
 		else
-			msg = "Status not changed.";
+			msg = messages.get(AppConstants.PLAN_STATUS_CHANGE_FAIL);
 
 		return new ResponseEntity<>(msg, HttpStatus.OK);
 	}
